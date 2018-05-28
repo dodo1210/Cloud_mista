@@ -180,6 +180,10 @@ class Cadastrar:
 		self.quintoContainer["pady"] = 20
 		self.quintoContainer.pack()
 
+		self.sextoContainer = Frame(master)
+		self.sextoContainer["pady"] = 20
+		self.sextoContainer.pack()
+
 		self.titulo = Label(self.primeiroContainer, text="Cadastre-se")
 		self.titulo["font"] = ("Arial", "10", "bold")
 		self.titulo.pack()
@@ -222,9 +226,19 @@ class Cadastrar:
 
 
 	def cadastrar(self):
-		if self.senha.get()==self.csenha.get():
-			cadastrar.destroy()
-			Application(inicio)
+		if self.senha.get() != self.csenha.get():
+			print("ghj")
+			self.senhaLabel = Label(self.sextoContainer, text="Senhas diferentes.\n Verifique sua senha", font=self.fontePadrao)
+			self.senhaLabel.pack(side=LEFT)
+		else:
+			toserver = Send("cad."+self.nome.get()+'\n'+self.senha.get())
+			oi = toserver.run()
+			if oi == "acerto mizeravi":
+				self.senhaLabel = Label(self.sextoContainer, text="Usuário ou senha\n cadastrados", font=self.fontePadrao)
+				self.senhaLabel.pack(side=LEFT)
+			else:
+				self.senhaLabel = Label(self.sextoContainer, text="Cadastro\n efetuado", font=self.fontePadrao)
+				self.senhaLabel.pack(side=LEFT)
 
 
 class Main:
@@ -282,8 +296,10 @@ class Main:
 		topeer = SendPeer(file)
 		topeer2 = SendPeer(file)
 		topeer3 = SendPeer(file)
-		oi = topeer.start()
-		oi = topeer2.start()
+		oi2 = topeer2.start()
+		oi3 = topeer3.start()
+		for i in range(3):
+			oi = topeer.start()
 						
 		print(oi)
 

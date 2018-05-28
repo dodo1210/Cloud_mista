@@ -16,29 +16,14 @@ def on_request(ch, method, props, body):
     arq.close()
 
     a=0
-    b=0
     for s in range(len(string)-1):
         #print(string[s]+string[s+1],body)
-        if body+'\n'==string[s]+string[s+1]:
+        if body==string[s]+string[s+1]:
             response = "acerto mizeravi"    
             a=100
-            b=100
-            break
-        elif body+'\n'=="cad."+string[s]+string[s+1]:
-            print("uh")
-            response = "acerto mizeravi"
-            b=100
-            a=100
-            break
         s = s+1
     if a == 0:
-        response = "erro mizeravi"
-    if b == 0:
-        errado, certo = body.split("cad.")
-        arq = open('cadastro.txt','a')
-        arq.write(str(certo)+"\n")
-        arq.close()
-        response = "erro mizeravi"
+        response = "erro mizeravi"    
 
     ch.basic_publish(exchange='',
                      routing_key=props.reply_to,

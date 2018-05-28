@@ -13,7 +13,7 @@ class Recieve(Thread):
         filename = ''
         imgdata = ""
 
-        if body.find(".txt") > 0:
+        if body.find(".txt") > 0 or body.find(".doc") > 0 or body.find(".docx") > 0 or body.find(".xls") > 0 or body.find(".xlsx") > 0 or body.find(".ppt") > 0 or body.find(".pptx") > 0 or body.find(".odt") > 0 or body.find(".odp") > 0 or body.find(".pdf") > 0 or body.find(".mp3") > 0 or body.find(".wav") > 0 or body.find(".ogg") > 0 or body.find(".mid") > 0 or body.find(".midi") > 0 or body.find(".sh") > 0 or body.find(".py") > 0 or body.find(".rb") > 0 or body.find(".c") > 0 or body.find(".cpp") > 0 or body.find(".js") > 0 or body.find(".java") > 0 or body.find(".go") > 0 or body.find(".png") > 0 or body.find(".jpg") > 0 or body.find(".gif") > 0 or body.find(".svg") > 0 or body.find(".xml") > 0 or body.find(".html") > 0 or body.find(".css") > 0 or body.find(".mp4") > 0 or body.find(".mkv") > 0 or body.find(".iso") > 0 or body.find(".rar") > 0 or body.find(".zip") > 0 :
 
             file = body[::-1]
             body, rest = file.split('/', 1)
@@ -22,7 +22,7 @@ class Recieve(Thread):
 
             arq = open("Server_peer/.recebidos.txt", "w")
             filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
-            arq.write(filename)
+            arq.write(filename+"\n")
             arq.close()
         else:
             imgdata = base64.b64decode(body)
@@ -30,6 +30,8 @@ class Recieve(Thread):
             arq = open("Server_peer/.recebidos.txt", "r")
             filename = arq.read()
             arq.close()
+
+            print("eita")
             
             with open(filename, 'wb') as f:
                 f.write(imgdata)
