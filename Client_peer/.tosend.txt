@@ -1,3 +1,0 @@
-/home/douglas/Documentos/Trabalho_sd/untitled.py
-/home/douglas/Documentos/Trabalho_sd/recebe.py
-/home/douglas/Documentos/Trabalho_sd/oi.txt
