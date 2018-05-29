@@ -22,19 +22,24 @@ class Recieve(Thread):
         imgdata = ""
         response = ""
 
-        if "down" in body>0:
-            print("hj")
+        if "down" in body:
+            print(body)
             arq = open("Server_peer/.todownload.txt", "r")
             files = arq.readlines()
             arq.close()
 
             for f in files:
-                if body == "down"+f:
+                oi,file = f.split("/",1)
+                erro,send = body.split("down",1)
+                print(file, "."+send)
+                if "."+send+"\n" == file:
                     stri = ""
-                    with open(self.num, "rb") as imageFile:
+                    arquivo,erro = file.split("\n",1)
+                    with open("Server_peer/"+arquivo+"\n", "rb") as imageFile:
                         stri = base64.b64encode(imageFile.read())
-                    print(stri)
-                    response = f+"@"+stri
+                    print("stri: "+stri)
+                    response = ""
+                    response = arquivo+"@"+stri
                     break
 
         else: 
@@ -48,7 +53,7 @@ class Recieve(Thread):
 
                 arq = open("Server_peer/.recebidos.txt", "w")
                 filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
-                arq.write(filename+"\n")
+                arq.write(filename)
                 arq.close()
 
                 arq = open("Server_peer/.todownload.txt", "a")
@@ -70,9 +75,7 @@ class Recieve(Thread):
                 print(filename)
                 response = "deu certo"
 
-        
         print(response)
-
 
         ch.basic_publish(exchange='',
                          routing_key=props.reply_to,
