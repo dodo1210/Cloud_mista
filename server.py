@@ -33,7 +33,7 @@ def on_request(ch, method, props, body):
         s = s+1
     if a == 0:
         response = "erro mizeravi"
-    if b == 0:
+    if b == 0 and "cad." in body:
         errado, certo = body.split("cad.")
         arq = open('cadastro.txt','a')
         arq.write(str(certo)+"\n")

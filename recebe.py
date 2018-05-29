@@ -12,32 +12,62 @@ class Recieve(Thread):
 
         filename = ''
         imgdata = ""
+        response = ""
 
-        if body.find(".txt") > 0 or body.find(".doc") > 0 or body.find(".docx") > 0 or body.find(".xls") > 0 or body.find(".xlsx") > 0 or body.find(".ppt") > 0 or body.find(".pptx") > 0 or body.find(".odt") > 0 or body.find(".odp") > 0 or body.find(".pdf") > 0 or body.find(".mp3") > 0 or body.find(".wav") > 0 or body.find(".ogg") > 0 or body.find(".mid") > 0 or body.find(".midi") > 0 or body.find(".sh") > 0 or body.find(".py") > 0 or body.find(".rb") > 0 or body.find(".c") > 0 or body.find(".cpp") > 0 or body.find(".js") > 0 or body.find(".java") > 0 or body.find(".go") > 0 or body.find(".png") > 0 or body.find(".jpg") > 0 or body.find(".gif") > 0 or body.find(".svg") > 0 or body.find(".xml") > 0 or body.find(".html") > 0 or body.find(".css") > 0 or body.find(".mp4") > 0 or body.find(".mkv") > 0 or body.find(".iso") > 0 or body.find(".rar") > 0 or body.find(".zip") > 0 :
-
-            file = body[::-1]
-            body, rest = file.split('/', 1)
+        if "down" in body:
             print(body)
-            file = body[::-1]
-
-            arq = open("Server_peer/.recebidos.txt", "w")
-            filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
-            arq.write(filename+"\n")
-            arq.close()
-        else:
-            imgdata = base64.b64decode(body)
-            
-            arq = open("Server_peer/.recebidos.txt", "r")
-            filename = arq.read()
+            arq = open("Server_peer/.todownload.txt", "r")
+            files = arq.readlines()
             arq.close()
 
-            print("eita")
-            
-            with open(filename, 'wb') as f:
-                f.write(imgdata)
-            print(filename)
+            for f in files:
+                oi,file = f.split("/",1)
+                erro,send = body.split("down",1)
+                print(file, "."+send)
+                if "."+send+"\n" == file:
+                    stri = ""
+                    arquivo,erro = file.split("\n",1)
+                    with open("Server_peer/"+arquivo+"\n", "rb") as imageFile:
+                        stri = base64.b64encode(imageFile.read())
+                    print("stri: "+stri)
+                    response = ""
+                    response = arquivo+"@"+stri
+                    break
 
-        response = "deu certo"
+        else: 
+
+            if body.find(".txt") > 0 or body.find(".doc") > 0 or body.find(".docx") > 0 or body.find(".xls") > 0 or body.find(".xlsx") > 0 or body.find(".ppt") > 0 or body.find(".pptx") > 0 or body.find(".odt") > 0 or body.find(".odp") > 0 or body.find(".pdf") > 0 or body.find(".mp3") > 0 or body.find(".wav") > 0 or body.find(".ogg") > 0 or body.find(".mid") > 0 or body.find(".midi") > 0 or body.find(".sh") > 0 or body.find(".py") > 0 or body.find(".rb") > 0 or body.find(".c") > 0 or body.find(".cpp") > 0 or body.find(".js") > 0 or body.find(".java") > 0 or body.find(".go") > 0 or body.find(".png") > 0 or body.find(".jpg") > 0 or body.find(".gif") > 0 or body.find(".svg") > 0 or body.find(".xml") > 0 or body.find(".html") > 0 or body.find(".css") > 0 or body.find(".mp4") > 0 or body.find(".mkv") > 0 or body.find(".iso") > 0 or body.find(".rar") > 0 or body.find(".zip") > 0 :
+
+                file = body[::-1]
+                body, rest = file.split('/', 1)
+                print(body)
+                file = body[::-1]
+
+                arq = open("Server_peer/.recebidos.txt", "w")
+                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                arq.write(filename)
+                arq.close()
+
+                arq = open("Server_peer/.todownload.txt", "a")
+                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                arq.write(filename+"\n")
+                arq.close()
+                response = "deu certo"
+            else:
+                imgdata = base64.b64decode(body)
+                
+                arq = open("Server_peer/.recebidos.txt", "r")
+                filename = arq.read()
+                arq.close()
+
+                print("eita")
+                
+                with open(filename, 'wb') as f:
+                    f.write(imgdata)
+                print(filename)
+                response = "deu certo"
+
+        
         print(response)
 
         ch.basic_publish(exchange='',

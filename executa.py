@@ -11,6 +11,8 @@ import base64
 import subprocess
 from tkinter import *
 from tkFileDialog import askopenfilename
+import Tkinter, Tkconstants, tkFileDialog
+
 
 class Recieve(Thread):
 
@@ -18,31 +20,59 @@ class Recieve(Thread):
 
         filename = ''
         imgdata = ""
+        response = ""
 
-        if body.find(".txt") > 0:
-
-            file = body[::-1]
-            body, rest = file.split('/', 1)
-            print(body)
-            file = body[::-1]
-
-            arq = open("Server_peer/.recebidos.txt", "w")
-            filename = 'Server_peer/.'+file 
-            arq.write(filename)
+        if "down" in body>0:
+            print("hj")
+            arq = open("Server_peer/.todownload.txt", "r")
+            files = arq.readlines()
             arq.close()
-        else:
-            imgdata = base64.b64decode(body)
-            
-            arq = open("Server_peer/.recebidos.txt", "r")
-            filename = arq.read()
-            arq.close()
-            
-            with open(filename, 'wb') as f:
-                f.write(imgdata)
-            print(filename)
 
-        response = "deu certo"
+            for f in files:
+                if body == "down"+f:
+                    stri = ""
+                    with open(self.num, "rb") as imageFile:
+                        stri = base64.b64encode(imageFile.read())
+                    print(stri)
+                    response = f+"@"+stri
+                    break
+
+        else: 
+
+            if body.find(".txt") > 0 or body.find(".doc") > 0 or body.find(".docx") > 0 or body.find(".xls") > 0 or body.find(".xlsx") > 0 or body.find(".ppt") > 0 or body.find(".pptx") > 0 or body.find(".odt") > 0 or body.find(".odp") > 0 or body.find(".pdf") > 0 or body.find(".mp3") > 0 or body.find(".wav") > 0 or body.find(".ogg") > 0 or body.find(".mid") > 0 or body.find(".midi") > 0 or body.find(".sh") > 0 or body.find(".py") > 0 or body.find(".rb") > 0 or body.find(".c") > 0 or body.find(".cpp") > 0 or body.find(".js") > 0 or body.find(".java") > 0 or body.find(".go") > 0 or body.find(".png") > 0 or body.find(".jpg") > 0 or body.find(".gif") > 0 or body.find(".svg") > 0 or body.find(".xml") > 0 or body.find(".html") > 0 or body.find(".css") > 0 or body.find(".mp4") > 0 or body.find(".mkv") > 0 or body.find(".iso") > 0 or body.find(".rar") > 0 or body.find(".zip") > 0 :
+
+                file = body[::-1]
+                body, rest = file.split('/', 1)
+                print(body)
+                file = body[::-1]
+
+                arq = open("Server_peer/.recebidos.txt", "w")
+                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                arq.write(filename+"\n")
+                arq.close()
+
+                arq = open("Server_peer/.todownload.txt", "a")
+                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                arq.write(filename+"\n")
+                arq.close()
+                response = "deu certo"
+            else:
+                imgdata = base64.b64decode(body)
+                
+                arq = open("Server_peer/.recebidos.txt", "r")
+                filename = arq.read()
+                arq.close()
+
+                print("eita")
+                
+                with open(filename, 'wb') as f:
+                    f.write(imgdata)
+                print(filename)
+                response = "deu certo"
+
+        
         print(response)
+
 
         ch.basic_publish(exchange='',
                          routing_key=props.reply_to,
@@ -262,7 +292,7 @@ class Main:
 		self.quartoContainer.pack()
 
 		self.quintoContainer = Frame(master)
-		self.quintoContainer["pady"] = 5
+		self.quintoContainer["pady"] = 50
 		self.quintoContainer.pack()
 
 		self.titulo = Label(self.primeiroContainer, text="Bem-Vindo"+user)
@@ -286,22 +316,62 @@ class Main:
 		self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
 		self.mensagem.pack()
 
-		self.mensagem = Label(self.quintoContainer, text="", font=self.fontePadrao)
-		self.mensagem.pack()
+		arq = open("Client_peer/.tosend.txt", "r")
+		self.string = arq.readlines()
+		arq.close()
+
+		scrollbar = Scrollbar(master)
+		scrollbar.pack(side=RIGHT, fill=Y)
+		self.listbox = Listbox(master, yscrollcommand=scrollbar.set)
+		cont = 0
+		
+		for s in self.string:
+			self.listbox.insert(END, s)
+			cont = cont+1
+		self.listbox.bind('<<ListboxSelect>>',self.down)
+		self.listbox.pack(fill=BOTH, expand=1)
+		scrollbar.config(command=self.listbox.yview)
+        
 
 	def send(self):
 		root = Tk()
 		root.withdraw()
 		file = askopenfilename()
+
+		arq = open("Client_peer/.tosend.txt", "a")
+		arq.write(file+"\n")
+		arq.close()
+
+		arq = open("Client_peer/.tosend.txt", "r")
+		string = arq.readlines()
+		arq.close()
+
+		self.mensagem = Label(self.quintoContainer, text=string[len(string)-1], font=self.fontePadrao)
+		self.mensagem.pack()
+
+		'''self.download = Button(self.quintoContainer)
+								self.download["text"] = "Download"
+								self.download["font"] = ("Calibri", "8")
+								self.download["width"] = 12
+								self.download["command"] = self.down
+								self.download.pack()'''
+
 		topeer = SendPeer(file)
 		topeer2 = SendPeer(file)
 		topeer3 = SendPeer(file)
 		oi2 = topeer2.start()
 		oi3 = topeer3.start()
-		for i in range(3):
-			oi = topeer.start()
-						
-		print(oi)
+		self.listbox.insert(END, file)
+
+	def down(self,evt):
+		value=str((self.listbox.get(ACTIVE)))
+		file = value[::-1]
+		value, f = file.split("/",1)
+		print(value)
+		topeer = Download(value[::-1])
+		topeer2 = Download(value[::-1])
+		oi = topeer.run()
+		oi2 = topeer2.run()
 
 
 class SendPeer(Thread):
@@ -325,6 +395,49 @@ class SendPeer(Thread):
             stri = base64.b64encode(imageFile.read())
         print(stri)
         return toserver.call(stri)
+        
+
+    def on_response(self, ch, method, props, body):
+        if self.corr_id == props.correlation_id:
+            self.response = body
+
+    def call(self, n):
+        self.response = None
+        self.corr_id = str(uuid.uuid4())
+        channel1.basic_publish(exchange='',
+                                   routing_key='rpc_peer',
+                                   properties=pika.BasicProperties(
+                                         reply_to = self.callback_queue,
+                                         correlation_id = self.corr_id,
+                                         ),
+                                   body=str(n))
+        while self.response is None:
+            connection.process_data_events()
+        return self.response
+
+
+class Download(Thread):
+
+    def __init__(self,num):
+    	
+        Thread.__init__(self)
+        self.num = num
+        result = channel1.queue_declare(exclusive=True)
+        self.callback_queue = result.method.queue
+
+        channel1.basic_consume(self.on_response, no_ack=True,
+                                   queue=self.callback_queue)
+
+    def run(self):
+        print(" [x] Enviando2")
+        string = toserver.call("down"+self.num)
+        print(string)
+        #filename = tkFileDialog.asksaveasfilename(initialdir = "/",title = "",filetypes = (("all files","*.*")))
+        if '@' in string :
+        	filename, data = string.split('@', 1)
+        	arquivo = base64.b64decode(data)
+	        with open("Client_peer/"+filename, 'wb') as f:
+		        f.write(arquivo)
         
 
     def on_response(self, ch, method, props, body):
@@ -397,7 +510,6 @@ b = Recieve()
 toserver = Send(None)
 topeer = SendPeer(None)
 user=""
-cadastrar = Tk()
 inicio = Tk()
 Application(inicio)
 inicio.mainloop()
