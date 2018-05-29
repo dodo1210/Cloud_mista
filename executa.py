@@ -16,6 +16,7 @@ import Tkinter, Tkconstants, tkFileDialog
 
 class Recieve(Thread):
 
+
     def on_request(self, ch, method, props, body):
 
         filename = ''
@@ -32,7 +33,7 @@ class Recieve(Thread):
                 oi,file = f.split("/",1)
                 erro,send = body.split("down",1)
                 print(file, "."+send)
-                if "."+send+"\n" == file:
+                if "."+send == file:
                     stri = ""
                     arquivo,erro = file.split("\n",1)
                     with open("Server_peer/"+arquivo+"\n", "rb") as imageFile:
@@ -52,7 +53,7 @@ class Recieve(Thread):
                 file = body[::-1]
 
                 arq = open("Server_peer/.recebidos.txt", "w")
-                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                filename = 'Server_peer/.'+file+"\n"  # I assume you have a way of picking unique filenames
                 arq.write(filename)
                 arq.close()
 
@@ -68,13 +69,14 @@ class Recieve(Thread):
                 filename = arq.read()
                 arq.close()
 
-                print("eita")
+                print(body)
                 
                 with open(filename, 'wb') as f:
                     f.write(imgdata)
                 print(filename)
                 response = "deu certo"
 
+        
         print(response)
 
         ch.basic_publish(exchange='',
@@ -99,20 +101,6 @@ class Recieve(Thread):
 
         print(" [x] Awaiting RPC requests")
         channel.start_consuming()
-
-	def fib():
-	    arq = open("str.txt", "w")
-	    str = None
-	    with open("/home/douglas/Documentos/Trabalho_sd/oi.txt", "rb") as imageFile:
-	        str = base64.b64encode(imageFile.read())
-	    arq.write(str)
-	    arq.close()
-
-	    arq = open("str.txt", "r")
-	    string = arq.read()
-	    print(string)
-	    arq.close()
-	    return string
 
 class Application:
 	def __init__(self, master=None):
@@ -364,7 +352,7 @@ class Main:
 		topeer3 = SendPeer(file)
 		oi2 = topeer2.start()
 		oi3 = topeer3.start()
-		self.listbox.insert(END, file)
+		self.listbox.insert(END, file+"\n")
 
 	def down(self,evt):
 		value=str((self.listbox.get(ACTIVE)))

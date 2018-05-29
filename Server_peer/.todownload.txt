@@ -1,0 +1,11 @@
+Server_peer/.oi.txt
+Server_peer/.oi.txt
+Server_peer/.cadastro.txt
+Server_peer/.untitled.py
+Server_peer/.untitled.py
+Server_peer/.cadastro.txt
+Server_peer/.envio.png
+Server_peer/.envio.png
+Server_peer/.cloudamqp_1m.txt~
+Server_peer/.cloudamqp_2m_arq.txt
+Server_peer/.cloudamqp_2m_arq.txt

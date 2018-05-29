@@ -44,7 +44,7 @@ class Recieve(Thread):
                 file = body[::-1]
 
                 arq = open("Server_peer/.recebidos.txt", "w")
-                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                filename = 'Server_peer/.'+file+"\n"  # I assume you have a way of picking unique filenames
                 arq.write(filename)
                 arq.close()
 
@@ -60,7 +60,7 @@ class Recieve(Thread):
                 filename = arq.read()
                 arq.close()
 
-                print("eita")
+                print(body)
                 
                 with open(filename, 'wb') as f:
                     f.write(imgdata)
