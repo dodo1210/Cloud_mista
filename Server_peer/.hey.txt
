@@ -1,0 +1,142 @@
+# -*- coding: utf-8 -*-
+import os, cv2, sys, time
+import numpy as np
+from scipy.cluster import hierarchy
+from scipy.spatial import distance
+from scipy.spatial.distance import pdist
+from threading import Thread
+def ColetaBase(pasta):
+    lista = sorted(os.listdir(pasta))
+    return lista
+
+def Quantization(imagem, altura, largura):
+    for alt in range(altura):
+        for larg in range(largura):
+            imagem[alt, larg] = int(imagem[alt, larg] / 16)
+    return imagem
+
+def GerarMatrizCoocorrencia(arquivo, dist):
+    matriz0 = np.zeros(shape=(16, 16), dtype=int)
+    matriz45 = np.zeros(shape=(16, 16), dtype=int)
+    matriz90 = np.zeros(shape=(16, 16), dtype=int)
+    matriz135 = np.zeros(shape=(16, 16), dtype=int)
+    img = cv2.imread(arquivo, 0)
+    altura = img.shape[0]
+    largura = img.shape[1]
+    img = Quantization(img, altura, largura)
+    for alt in range(altura):
+        for larg in range(largura):
+            try:
+                posi1 = img[alt, larg]
+                posi2 = img[alt, (larg + dist)]
+                matriz0[posi1, posi2] += 1
+            except:
+                pass
+            try:
+                posi1 = img[alt, larg]
+                posi2 = img[alt + dist, larg + dist]
+                matriz45[posi1, posi2] += 1
+            except:
+                pass
+            try:
+                posi1 = img[alt, larg]
+                posi2 = img[alt + dist, larg]
+                matriz90[posi1, posi2] += 1
+            except:
+                pass
+            try:
+                posi1 = img[alt, larg]
+                posi2 = img[alt + dist, larg - dist]
+                matriz135[posi1, posi2] += 1
+            except:
+                pass
+    return matriz0, matriz45, matriz90, matriz135
+
+
+def DistanciaEuclidiana(matriz):
+    altura, largura = matriz.shape
+    D = np.zeros((8,8))
+    for alt in range(altura):
+        for larg in range(alt+1,largura):
+            a = matriz[alt]
+            b = matriz[larg]
+            D[alt,larg] = distance.euclidean(a,b)
+    return D
+
+    return matrizEucli
+
+def GeraDendrograma(matriz0, matriz45, matriz90, matriz135):
+    dist0 = pdist(matriz0,'euclidean')
+    dist45 = pdist(matriz45,'euclidean')
+    dist90 = pdist(matriz90,'euclidean')
+    dist135 = pdist(matriz135, 'euclidean')
+    h0 = hierarchy.linkage(dist0,method='single')
+    h45 = hierarchy.linkage(dist45,method='single')
+    h90 = hierarchy.linkage(dist90,method='single')
+    h135 = hierarchy.linkage(dist135,method='single')
+    h0 = float(h0.sum())
+    h45 = float(h45.sum())
+    h90 = float(h90.sum())
+    h135 = float(h135.sum())
+    return h0, h45, h90, h135
+
+
+def Processando(massa, naoMassa, dist, arquivoDest, dirMassa, dirNaoMassa,numProcess):
+
+    arquivo = open(arquivoDest,"w")
+
+    print(">>>Processo <" + str(numProcess) + "> INICIADO!")
+    cont = 1
+    for img in massa:
+        massa0, massa45, massa90, massa135 = GerarMatrizCoocorrencia(dirMassa+img, dist)
+        sum0, sum45, sum90, sum135 = GeraDendrograma(massa0, massa45, massa90, massa135)
+        texto = "-1 1:" + str(sum0) +" 2:" + str(sum45) + " 3:" + str(sum90) + " 4:" + str(sum135) + "\n"
+        arquivo.write(texto)
+        print ("Processo<"+str(numProcess)+">: Imagem Massa "+str(cont)+" processada com sucesso!")
+        cont += 1
+    cont = 1
+    for img in naoMassa:
+        massa0, massa45, massa90, massa135 = GerarMatrizCoocorrencia(dirNaoMassa+img, dist)
+        sum0, sum45, sum90, sum135 = GeraDendrograma(massa0, massa45, massa90, massa135)
+        texto = "1 1:" + str(sum0) + " 2:" + str(sum45) + " 3:" + str(sum90) + " 4:" + str(sum135) + "\n"
+        arquivo.write(texto)
+        print("Processo<" + str(numProcess) + ">: Imagem Não Massa" + str(cont) + " processada com sucesso!")
+        cont += 1
+    arquivo.close()
+    print("<<<Processo <"+str(numProcess)+"> FINALIZADO!")
+if __name__ == '__main__':
+    MassaLBP = "/home/william/Dropbox/Iniciação Científica/Bases/Base Mama/Base 2/Massa_LBP/"
+    NaoMassaLBP = "/home/william/Dropbox/Iniciação Científica/Bases/Base Mama/Base 2/Nao_Mass_LBP/"
+    Massa = "/home/william/Dropbox/Iniciação Científica/Bases/Base Mama/Base 2/Massa/"
+    NaoMassa = "/home/william/Dropbox/Iniciação Científica/Bases/Base Mama/Base 2/Nao_Massa/"
+    '''
+        Coletando Base
+    '''
+    MassaLBPLista = ColetaBase(MassaLBP)
+    NaoMassaLBPLista = ColetaBase(NaoMassaLBP)
+    MassaLista = ColetaBase(Massa)
+    NaoMassaLista = ColetaBase(NaoMassa)
+    '''
+        Preparando Threads
+    '''
+    th1 = Thread(target=Processando, args=[MassaLBPLista, NaoMassaLBPLista, 1, "Dist1Q16LBPSingle.libsvm", MassaLBP, NaoMassaLBP, 1])
+    th2 = Thread(target=Processando, args=[MassaLista, NaoMassaLista, 1, "Dist1Q16NormalSingle.libsvm", Massa, NaoMassa, 2])
+    th3 = Thread(target=Processando, args=[MassaLBPLista, NaoMassaLBPLista, 2, "Dist2Q16LBPSingle.libsvm", MassaLBP, NaoMassaLBP, 3])
+    th4 = Thread(target=Processando, args=[MassaLista, NaoMassaLista, 2, "Dist2Q16NormalSingle.libsvm", Massa, NaoMassa, 4])
+    th5 = Thread(target=Processando, args=[MassaLBPLista, NaoMassaLBPLista, 3, "Dist3Q16LBPSingle.libsvm", MassaLBP, NaoMassaLBP, 5])
+    th6 = Thread(target=Processando, args=[MassaLista, NaoMassaLista, 3, "Dist3Q16NormalSingle.libsvm", Massa, NaoMassa, 6])
+    '''
+        Rodando Threads
+    '''
+    inicio = time.time()
+    th1.start()
+    th2.start()
+    th3.start()
+    th4.start()
+    th5.start()
+    th6.start()
+    type(a)
+    while th1.isAlive() or th2.isAlive() or th3.isAlive() or th4.isAlive() or th5.isAlive() or th6.isAlive():
+        time.sleep(1)
+    fim = time.time()
+    print("Tempo total gasto: "+str(fim-inicio))

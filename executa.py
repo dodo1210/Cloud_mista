@@ -73,7 +73,7 @@ class Recieve(Thread):
                 
                 with open(filename, 'wb') as f:
                     f.write(imgdata)
-                print(filename)
+                print(imgdata)
                 response = "deu certo"
 
         
@@ -156,21 +156,30 @@ class Application:
 		self.autenticar["command"] = self.cadastrar
 		self.autenticar.pack()
 
-		self.mensagem = Label(self.quartoContainer, text="", font=self.fontePadrao)
-		self.mensagem.pack()
+		
 
 	#Método verificar senha
 	def verificaSenha(self):
 		toserver = Send(self.nome.get()+'\n'+self.senha.get())
 		oi = toserver.run()
-		if oi == "acerto mizeravi":
+		if "acerto mizeravi" in oi:
+
+			arq = open('.posicao.txt',"w")
+			p, erro = oi.split("acerto mizeravi",1)
+			print("dcfvgbh"+oi,p,erro)
+			arq.write(p)
+			arq.close()
+
 			inicio.destroy()
 			b.start()
 			main = Tk()
 			Main(main)
 			main.mainloop()
+
 		else:
 			print("errou")
+			self.mensagem = Label(self.quartoContainer, text="Senha incorreta ou usuário incorretos", font=self.fontePadrao)
+            
 
 	def cadastrar(self):
 		cadastrar = Tk()
@@ -352,7 +361,7 @@ class Main:
 		topeer3 = SendPeer(file)
 		oi2 = topeer2.start()
 		oi3 = topeer3.start()
-		self.listbox.insert(END, file+"\n")
+		self.listbox.insert(END, file+"\num")
 
 	def down(self,evt):
 		value=str((self.listbox.get(ACTIVE)))
@@ -361,8 +370,10 @@ class Main:
 		print(value)
 		topeer = Download(value[::-1])
 		topeer2 = Download(value[::-1])
+		topeer3 = Download(value[::-1])
 		oi = topeer.run()
 		oi2 = topeer2.run()
+		oi3 = topeer3.run()
 
 
 class SendPeer(Thread):

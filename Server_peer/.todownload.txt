@@ -9,3 +9,13 @@ Server_peer/.envio.png
 Server_peer/.cloudamqp_1m.txt~
 Server_peer/.cloudamqp_2m_arq.txt
 Server_peer/.cloudamqp_2m_arq.txt
+Server_peer/.hey.txt
+Server_peer/.hey.txt
+Server_peer/.hey.txt
+Server_peer/.hey.txt
+Server_peer/.main.py
+Server_peer/.asdasd.png
+Server_peer/.envio.png
+Server_peer/.cloud.png
+Server_peer/.oi.txt
+Server_peer/.recebe.py
