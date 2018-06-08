@@ -17,16 +17,18 @@ def on_request(ch, method, props, body):
 
     a=0
     b=0
+    cont = 0
     for s in range(len(string)-1):
+        cont = cont+1
         #print(string[s]+string[s+1],body)
         if body+'\n'==string[s]+string[s+1]:
-            response = "acerto mizeravi"    
+            response = str(cont)+"acerto mizeravi"    
             a=100
             b=100
             break
         elif body+'\n'=="cad."+string[s]+string[s+1]:
             print("uh")
-            response = "acerto mizeravi"
+            response = str(cont)+"acerto mizeravi"
             b=100
             a=100
             break

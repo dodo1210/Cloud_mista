@@ -36,45 +36,56 @@ class Recieve(Thread):
                 if "."+send == file:
                     stri = ""
                     arquivo,erro = file.split("\n",1)
-                    with open("Server_peer/"+arquivo+"\n", "rb") as imageFile:
+                    with open("Server_peer/"+file, "rb") as imageFile:
                         stri = base64.b64encode(imageFile.read())
                     print("stri: "+stri)
                     response = ""
                     response = arquivo+"@"+stri
                     break
 
-        else: 
+        else:
 
-            if body.find(".txt") > 0 or body.find(".doc") > 0 or body.find(".docx") > 0 or body.find(".xls") > 0 or body.find(".xlsx") > 0 or body.find(".ppt") > 0 or body.find(".pptx") > 0 or body.find(".odt") > 0 or body.find(".odp") > 0 or body.find(".pdf") > 0 or body.find(".mp3") > 0 or body.find(".wav") > 0 or body.find(".ogg") > 0 or body.find(".mid") > 0 or body.find(".midi") > 0 or body.find(".sh") > 0 or body.find(".py") > 0 or body.find(".rb") > 0 or body.find(".c") > 0 or body.find(".cpp") > 0 or body.find(".js") > 0 or body.find(".java") > 0 or body.find(".go") > 0 or body.find(".png") > 0 or body.find(".jpg") > 0 or body.find(".gif") > 0 or body.find(".svg") > 0 or body.find(".xml") > 0 or body.find(".html") > 0 or body.find(".css") > 0 or body.find(".mp4") > 0 or body.find(".mkv") > 0 or body.find(".iso") > 0 or body.find(".rar") > 0 or body.find(".zip") > 0 :
+            arq = open('.posicao.txt','r')
+            posicao = arq.read()
+            arq.close()
 
-                file = body[::-1]
-                body, rest = file.split('/', 1)
-                print(body)
-                file = body[::-1]
+            print(body[0])
 
-                arq = open("Server_peer/.recebidos.txt", "w")
-                filename = 'Server_peer/.'+file+"\n"  # I assume you have a way of picking unique filenames
-                arq.write(filename)
-                arq.close()
+            posi = int(posicao)
+            eh = body[0]
 
-                arq = open("Server_peer/.todownload.txt", "a")
-                filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
-                arq.write(filename+"\n")
-                arq.close()
-                response = "deu certo"
-            else:
-                imgdata = base64.b64decode(body)
-                
-                arq = open("Server_peer/.recebidos.txt", "r")
-                filename = arq.read()
-                arq.close()
+            if eh!=posi:
 
-                print(body)
-                
-                with open(filename, 'wb') as f:
-                    f.write(imgdata)
-                print(imgdata)
-                response = "deu certo"
+                if body.find(".txt") > 0 or body.find(".doc") > 0 or body.find(".docx") > 0 or body.find(".xls") > 0 or body.find(".xlsx") > 0 or body.find(".ppt") > 0 or body.find(".pptx") > 0 or body.find(".odt") > 0 or body.find(".odp") > 0 or body.find(".pdf") > 0 or body.find(".mp3") > 0 or body.find(".wav") > 0 or body.find(".ogg") > 0 or body.find(".mid") > 0 or body.find(".midi") > 0 or body.find(".sh") > 0 or body.find(".py") > 0 or body.find(".rb") > 0 or body.find(".c") > 0 or body.find(".cpp") > 0 or body.find(".js") > 0 or body.find(".java") > 0 or body.find(".go") > 0 or body.find(".png") > 0 or body.find(".jpg") > 0 or body.find(".gif") > 0 or body.find(".svg") > 0 or body.find(".xml") > 0 or body.find(".html") > 0 or body.find(".css") > 0 or body.find(".mp4") > 0 or body.find(".mkv") > 0 or body.find(".iso") > 0 or body.find(".rar") > 0 or body.find(".zip") > 0 :
+
+                    file = body[::-1]
+                    body, rest = file.split('/', 1)
+                    print(body)
+                    file = body[::-1]
+
+                    arq = open("Server_peer/.recebidos.txt", "w")
+                    filename = 'Server_peer/.'+file+"\n"  # I assume you have a way of picking unique filenames
+                    arq.write(filename)
+                    arq.close()
+
+                    arq = open("Server_peer/.todownload.txt", "a")
+                    filename = 'Server_peer/.'+file  # I assume you have a way of picking unique filenames
+                    arq.write(filename+"\n")
+                    arq.close()
+                    response = "deu certo"
+                else:
+                    print("oi"+body[0])
+                    error, body = body.split(body[0],1)
+                    imgdata = base64.b64decode(body)
+
+                    arq = open("Server_peer/.recebidos.txt", "r")
+                    filename = arq.read()
+                    arq.close()
+                    
+                    with open(filename, 'wb') as f:
+                        f.write(imgdata)
+                    print(filename)
+                    response = "deu certo"
 
         
         print(response)
@@ -356,12 +367,14 @@ class Main:
 								self.download["command"] = self.down
 								self.download.pack()'''
 
+
+
 		topeer = SendPeer(file)
 		topeer2 = SendPeer(file)
 		topeer3 = SendPeer(file)
 		oi2 = topeer2.start()
 		oi3 = topeer3.start()
-		self.listbox.insert(END, file+"\num")
+		self.listbox.insert(END, file+"\n")
 
 	def down(self,evt):
 		value=str((self.listbox.get(ACTIVE)))
@@ -374,6 +387,7 @@ class Main:
 		oi = topeer.run()
 		oi2 = topeer2.run()
 		oi3 = topeer3.run()
+		print(oi,oi2,oi3)
 
 
 class SendPeer(Thread):
@@ -382,10 +396,10 @@ class SendPeer(Thread):
     	
         Thread.__init__(self)
         self.num = num
-        result = channel1.queue_declare(exclusive=True)
+        result = channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
 
-        channel1.basic_consume(self.on_response, no_ack=True,
+        channel.basic_consume(self.on_response, no_ack=True,
                                    queue=self.callback_queue)
 
     def run(self):
@@ -406,7 +420,55 @@ class SendPeer(Thread):
     def call(self, n):
         self.response = None
         self.corr_id = str(uuid.uuid4())
-        channel1.basic_publish(exchange='',
+        channel.basic_publish(exchange='',
+                                   routing_key='rpc_peer',
+                                   properties=pika.BasicProperties(
+                                         reply_to = self.callback_queue,
+                                         correlation_id = self.corr_id,
+                                         ),
+                                   body=str(n))
+        while self.response is None:
+            connection.process_data_events()
+        return self.response
+
+
+class SendPeer(Thread):
+
+    def __init__(self,num):
+    	
+        Thread.__init__(self)
+        self.num = num
+        result = channel.queue_declare(exclusive=True)
+        self.callback_queue = result.method.queue
+
+        channel.basic_consume(self.on_response, no_ack=True,
+                                   queue=self.callback_queue)
+
+    def run(self):
+        print(" [x] Enviando2")
+        toserver.call(self.num)
+
+        arq = open('.posicao.txt','r')
+        posicao = arq.read()
+        arq.close()
+
+        print(posicao)
+
+        stri = ""
+        with open(self.num, "rb") as imageFile:
+            stri = base64.b64encode(imageFile.read())
+        print(stri)
+        return toserver.call(posicao+stri)
+        
+
+    def on_response(self, ch, method, props, body):
+        if self.corr_id == props.correlation_id:
+            self.response = body
+
+    def call(self, n):
+        self.response = None
+        self.corr_id = str(uuid.uuid4())
+        channel.basic_publish(exchange='',
                                    routing_key='rpc_peer',
                                    properties=pika.BasicProperties(
                                          reply_to = self.callback_queue,
@@ -424,10 +486,10 @@ class Download(Thread):
     	
         Thread.__init__(self)
         self.num = num
-        result = channel1.queue_declare(exclusive=True)
+        result = channel.queue_declare(exclusive=True)
         self.callback_queue = result.method.queue
 
-        channel1.basic_consume(self.on_response, no_ack=True,
+        channel.basic_consume(self.on_response, no_ack=True,
                                    queue=self.callback_queue)
 
     def run(self):
@@ -449,7 +511,7 @@ class Download(Thread):
     def call(self, n):
         self.response = None
         self.corr_id = str(uuid.uuid4())
-        channel1.basic_publish(exchange='',
+        channel.basic_publish(exchange='',
                                    routing_key='rpc_peer',
                                    properties=pika.BasicProperties(
                                          reply_to = self.callback_queue,
@@ -498,10 +560,6 @@ class Send(Thread):
         return self.response
 
 
-url1 = os.environ.get('nfwwsnsc', 'amqp://nfwwsnsc:6q16k6MT2TnoQdnNq2FZwdbLJNPb2dNU@crocodile.rmq.cloudamqp.com/nfwwsnsc')
-params1 = pika.URLParameters(url1)
-connection1 = pika.BlockingConnection(params1)
-channel1 = connection1.channel()
 
 url = os.environ.get('tkxllkea', 'amqp://popzhidh:Oqlcsw9vbHel4zMcZbTQv2z7sH0ZoNxG@spider.rmq.cloudamqp.com/popzhidh')
 params = pika.URLParameters(url)
