@@ -15,24 +15,39 @@ class Recieve(Thread):
         response = ""
 
         if "down" in body:
-            print(body)
-            arq = open("Server_peer/.todownload.txt", "r")
-            files = arq.readlines()
+
+            arq = open('.posicao.txt','r')
+            posicao = arq.read()
             arq.close()
 
-            for f in files:
-                oi,file = f.split("/",1)
-                erro,send = body.split("down",1)
-                print(file, "."+send)
-                if "."+send == file:
-                    stri = ""
-                    arquivo,erro = file.split("\n",1)
-                    with open("Server_peer/"+file, "rb") as imageFile:
-                        stri = base64.b64encode(imageFile.read())
-                    print("stri: "+stri)
-                    response = ""
-                    response = arquivo+"@"+stri
-                    break
+            print(body[0])
+
+            posi = int(posicao)
+            eh = body[0]
+
+            if eh!=posi:
+
+                print(body)
+                arq = open("Server_peer/.todownload.txt", "r")
+                files = arq.readlines()
+                arq.close()
+
+                for f in files:
+                    print(f)
+                    oi,file = f.split("/",1)
+                    erro,send = body.split("down",1)
+                    print(file, "."+send)
+                    if "."+send == file:
+                        stri = ""
+                        arquivo,erro = file.split("\n",1)
+                        with open("Server_peer/"+file, "rb") as imageFile:
+                            stri = base64.b64encode(imageFile.read())
+                        l = list(stri)
+                        l.pop(0)
+                        print(l)
+                        stri = ''.join(l)
+                        response = arquivo+"@"+stri
+                        break
 
         else:
 

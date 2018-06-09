@@ -12,7 +12,7 @@ import subprocess
 from tkinter import *
 from tkFileDialog import askopenfilename
 import Tkinter, Tkconstants, tkFileDialog
-
+import hashlib
 
 class Recieve(Thread):
 
@@ -24,24 +24,39 @@ class Recieve(Thread):
         response = ""
 
         if "down" in body:
-            print(body)
-            arq = open("Server_peer/.todownload.txt", "r")
-            files = arq.readlines()
+
+            arq = open('.posicao.txt','r')
+            posicao = arq.read()
             arq.close()
 
-            for f in files:
-                oi,file = f.split("/",1)
-                erro,send = body.split("down",1)
-                print(file, "."+send)
-                if "."+send == file:
-                    stri = ""
-                    arquivo,erro = file.split("\n",1)
-                    with open("Server_peer/"+file, "rb") as imageFile:
-                        stri = base64.b64encode(imageFile.read())
-                    print("stri: "+stri)
-                    response = ""
-                    response = arquivo+"@"+stri
-                    break
+            print(body[0])
+
+            posi = int(posicao)
+            eh = body[0]
+
+            if eh!=posi:
+
+                print(body)
+                arq = open("Server_peer/.todownload.txt", "r")
+                files = arq.readlines()
+                arq.close()
+
+                for f in files:
+                    print(f)
+                    oi,file = f.split("/",1)
+                    erro,send = body.split("down",1)
+                    print(file, "."+send)
+                    if "."+send == file:
+                        stri = ""
+                        arquivo,erro = file.split("\n",1)
+                        with open("Server_peer/"+file, "rb") as imageFile:
+                            stri = base64.b64encode(imageFile.read())
+                        l = list(stri)
+                        l.pop(0)
+                        print(l)
+                        stri = ''.join(l)
+                        response = arquivo+"@"+stri
+                        break
 
         else:
 
@@ -74,13 +89,13 @@ class Recieve(Thread):
                     arq.close()
                     response = "deu certo"
                 else:
-                    print("oi"+body[0])
-                    error, body = body.split(body[0],1)
                     imgdata = base64.b64decode(body)
-
+                    
                     arq = open("Server_peer/.recebidos.txt", "r")
                     filename = arq.read()
                     arq.close()
+
+                    print(body)
                     
                     with open(filename, 'wb') as f:
                         f.write(imgdata)
@@ -348,6 +363,7 @@ class Main:
 		root = Tk()
 		root.withdraw()
 		file = askopenfilename()
+		arquivo = file
 
 		arq = open("Client_peer/.tosend.txt", "a")
 		arq.write(file+"\n")
@@ -368,13 +384,12 @@ class Main:
 								self.download.pack()'''
 
 
-
-		topeer = SendPeer(file)
-		topeer2 = SendPeer(file)
-		topeer3 = SendPeer(file)
+		topeer = SendPeer(arquivo)
+		topeer2 = SendPeer(arquivo)
+		topeer3 = SendPeer(arquivo)
 		oi2 = topeer2.start()
 		oi3 = topeer3.start()
-		self.listbox.insert(END, file+"\n")
+		self.listbox.insert(END, arquivo+"\n")
 
 	def down(self,evt):
 		value=str((self.listbox.get(ACTIVE)))
@@ -383,53 +398,11 @@ class Main:
 		print(value)
 		topeer = Download(value[::-1])
 		topeer2 = Download(value[::-1])
-		topeer3 = Download(value[::-1])
+		topeer3 = Download(value[::-1])	
 		oi = topeer.run()
 		oi2 = topeer2.run()
 		oi3 = topeer3.run()
 		print(oi,oi2,oi3)
-
-
-class SendPeer(Thread):
-
-    def __init__(self,num):
-    	
-        Thread.__init__(self)
-        self.num = num
-        result = channel.queue_declare(exclusive=True)
-        self.callback_queue = result.method.queue
-
-        channel.basic_consume(self.on_response, no_ack=True,
-                                   queue=self.callback_queue)
-
-    def run(self):
-        print(" [x] Enviando2")
-        toserver.call(self.num)
-
-        stri = ""
-        with open(self.num, "rb") as imageFile:
-            stri = base64.b64encode(imageFile.read())
-        print(stri)
-        return toserver.call(stri)
-        
-
-    def on_response(self, ch, method, props, body):
-        if self.corr_id == props.correlation_id:
-            self.response = body
-
-    def call(self, n):
-        self.response = None
-        self.corr_id = str(uuid.uuid4())
-        channel.basic_publish(exchange='',
-                                   routing_key='rpc_peer',
-                                   properties=pika.BasicProperties(
-                                         reply_to = self.callback_queue,
-                                         correlation_id = self.corr_id,
-                                         ),
-                                   body=str(n))
-        while self.response is None:
-            connection.process_data_events()
-        return self.response
 
 
 class SendPeer(Thread):
@@ -499,6 +472,8 @@ class Download(Thread):
         #filename = tkFileDialog.asksaveasfilename(initialdir = "/",title = "",filetypes = (("all files","*.*")))
         if '@' in string :
         	filename, data = string.split('@', 1)
+        	print("str: "+data)
+        	data += "=" * ((4 - len(data) % 4) % 4)
         	arquivo = base64.b64decode(data)
 	        with open("Client_peer/"+filename, 'wb') as f:
 		        f.write(arquivo)
@@ -566,6 +541,7 @@ params = pika.URLParameters(url)
 connection = pika.BlockingConnection(params)
 channel = connection.channel() # start a channel
 
+chave = hashlib.sha256()
 b = Recieve()
 toserver = Send(None)
 topeer = SendPeer(None)
