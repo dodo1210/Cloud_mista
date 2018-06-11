@@ -9,7 +9,10 @@ import os
 from threading import Thread
 import base64
 import subprocess
-from tkinter import *
+try:
+	from tKinter import *
+except ImportError:
+	from tkinter import *
 from tkFileDialog import askopenfilename
 import Tkinter, Tkconstants, tkFileDialog
 import hashlib
