@@ -1,1 +1,14 @@
+Server_peer/.oi.txt
+Server_peer/.oi.txt
+Server_peer/.cryp.py
+Server_peer/.oi.txt
+Server_peer/.oi.txt
+Server_peer/.oi.txt
+Server_peer/..posicao.txt
+Server_peer/.cadastro.txt
+Server_peer/..tosend.txt
+Server_peer/..posicao.txt
+Server_peer/.oi.txt
+Server_peer/.cryp.py
+Server_peer/..cryp.py
 

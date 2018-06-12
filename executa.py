@@ -15,7 +15,6 @@ except ImportError:
 	from tkinter import *
 from tkFileDialog import askopenfilename
 import Tkinter, Tkconstants, tkFileDialog
-import hashlib
 
 class Recieve(Thread):
 
@@ -545,7 +544,6 @@ params = pika.URLParameters(url)
 connection = pika.BlockingConnection(params)
 channel = connection.channel() # start a channel
 
-chave = hashlib.sha256()
 b = Recieve()
 toserver = Send(None)
 topeer = SendPeer(None)

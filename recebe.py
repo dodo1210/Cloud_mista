@@ -33,7 +33,7 @@ class Recieve(Thread):
                 arq.close()
 
                 for f in files:
-                    print(f)
+                    print("a"+f)
                     oi,file = f.split("/",1)
                     erro,send = body.split("down",1)
                     print(file, "."+send)
