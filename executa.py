@@ -15,6 +15,7 @@ except ImportError:
 	from tkinter import *
 from tkFileDialog import askopenfilename
 import Tkinter, Tkconstants, tkFileDialog
+import hashlib
 
 class Recieve(Thread):
 
@@ -205,9 +206,8 @@ class Application:
 			main.mainloop()
 
 		else:
-			self.titulo = Label(self.quartoContainer, text="Senha ou usuário incorreto")
-		self.titulo["font"] = ("Arial", "10", "bold")
-		self.titulo.pack()
+			print("errou")
+			self.mensagem = Label(self.quartoContainer, text="Senha incorreta ou usuário incorretos", font=self.fontePadrao)
             
 
 	def cadastrar(self):
@@ -544,6 +544,7 @@ params = pika.URLParameters(url)
 connection = pika.BlockingConnection(params)
 channel = connection.channel() # start a channel
 
+chave = hashlib.sha256()
 b = Recieve()
 toserver = Send(None)
 topeer = SendPeer(None)

@@ -1,11 +1,2 @@
 /home/douglas/Documentos/Trabalho_sd/cryp.py
-/home/douglas/Documentos/Trabalho_sd/oi.txt
-/home/douglas/Documentos/Trabalho_sd/oi.txt
-/home/douglas/Documentos/Trabalho_sd/oi.txt
 /home/douglas/Documentos/Trabalho_sd/.posicao.txt
-/home/douglas/Documentos/Trabalho_sd/cadastro.txt
-/home/douglas/Documentos/Trabalho_sd/Client_peer/.tosend.txt
-/home/douglas/Documentos/Trabalho_sd/cryp.py
-/home/douglas/Documentos/Trabalho_sd/cadastro.txt
-/home/douglas/Documentos/Trabalho_sd/Server_peer/.cryp.py
-
