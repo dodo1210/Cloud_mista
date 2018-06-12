@@ -206,8 +206,9 @@ class Application:
 			main.mainloop()
 
 		else:
-			print("errou")
-			self.mensagem = Label(self.quartoContainer, text="Senha incorreta ou usuário incorretos", font=self.fontePadrao)
+			self.titulo = Label(self.quartoContainer, text="Senha ou usuário incorreto")
+		self.titulo["font"] = ("Arial", "10", "bold")
+		self.titulo.pack()
             
 
 	def cadastrar(self):
