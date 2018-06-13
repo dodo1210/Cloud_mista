@@ -1,2 +1,4 @@
 Server_peer/.cryp.py
-Server_peer/..posicao.txt
+Server_peer/.recebe.py
+Server_peer/.recebe.py
+Server_peer/.server.py

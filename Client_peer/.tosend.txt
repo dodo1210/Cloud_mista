@@ -1,2 +1,0 @@
-/home/douglas/Documentos/Trabalho_sd/cryp.py
-/home/douglas/Documentos/Trabalho_sd/.posicao.txt
